@@ -333,3 +333,8 @@ dmypy.json
 .history
 
 # End of https://www.toptal.com/developers/gitignore/api/python,jupyternotebooks,java,visualstudiocode,pycharm,intellij
+
+
+# Not tracked folders
+output/
+data/seeded/
