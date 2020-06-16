@@ -64,6 +64,7 @@ def run_experiment(same_as, DB_lines, FB_lines, same_list, frac, n=20):
     f1_scores = []
     for i in range(n):
         print("Run {}".format(i))
+        print("Creating seed...")
         sampled = create_sample(same_as, frac)
         DB_lines_labeled = DB_lines + sampled["DB_labeled"].to_list()
         FB_lines_labeled = FB_lines + sampled["FB_labeled"].to_list()
@@ -110,6 +111,7 @@ def run_experiment(same_as, DB_lines, FB_lines, same_list, frac, n=20):
 def main(no_paris):
 
     if not no_paris:
+        print("Start working on PARIS. Loading datasets...")
         same_as = pd.read_csv("data/DB15K_SameAsLink.nt", " ", header=None)[[0,2]]
         same_as.rename(columns={0:"FB", 2:"DB"}, inplace=True)
         DB = open("data/DB15K_EntityTriples.nt", "r")
@@ -119,6 +121,7 @@ def main(no_paris):
         same_file = open("data/DB15K_SameAsLink.nt", "r")
         same_list = same_file.readlines()
         same_list = [same.replace(" <SameAs>", "").replace("<http://dbpedia.org/","dbp:")[:-4] for same in same_list]
+
         for frac in [0.1, 0.2, 0.5]:
             precisions, recalls, f1_scores, timings = run_experiment(same_as, DB_lines, FB_lines, same_list, frac)
             print("Finished with fraction {}%. Saving data...".format(frac*100))
