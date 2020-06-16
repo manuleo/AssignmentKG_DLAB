@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import os, shutil
 import time
+import argparse
+import pickle
 
 def create_label(sample_row):
     label = sample_row["DB"].split("/")[-1].replace(">","")
@@ -55,7 +57,7 @@ def check_result(same_list, out_path):
     return precision_dict, recall_dict, f1_dict
 
 def run_experiment(same_as, DB_lines, FB_lines, same_list, frac, n=20):
-    print("Chosen fraction = {} %".format(frac*100))
+    print("Chosen fraction = {}%".format(frac*100))
     timings = []
     precisions = []
     recalls = []
@@ -105,23 +107,46 @@ def run_experiment(same_as, DB_lines, FB_lines, same_list, frac, n=20):
 
 
 
-def main():
+def main(no_paris):
 
-    same_as = pd.read_csv("data/DB15K_SameAsLink.nt", " ", header=None)[[0,2]]
-    same_as.rename(columns={0:"FB", 2:"DB"}, inplace=True)
-    DB = open("data/DB15K_EntityTriples.nt", "r")
-    FB = open("data/FB15K_EntityTriples.nt", "r")
-    DB_lines = DB.readlines()
-    FB_lines = FB.readlines()
-    same_file = open("data/DB15K_SameAsLink.nt", "r")
-    same_list = same_file.readlines()
-    same_list = [same.replace(" <SameAs>", "").replace("<http://dbpedia.org/","dbp:")[:-4] for same in same_list]
-    precisions, recalls, f1_scores, timings = run_experiment(same_as, DB_lines, FB_lines, same_list, 0.1, 5)
-
-    DB.close()
-    FB.close()
-    same_file.close()
+    if not no_paris:
+        same_as = pd.read_csv("data/DB15K_SameAsLink.nt", " ", header=None)[[0,2]]
+        same_as.rename(columns={0:"FB", 2:"DB"}, inplace=True)
+        DB = open("data/DB15K_EntityTriples.nt", "r")
+        FB = open("data/FB15K_EntityTriples.nt", "r")
+        DB_lines = DB.readlines()
+        FB_lines = FB.readlines()
+        same_file = open("data/DB15K_SameAsLink.nt", "r")
+        same_list = same_file.readlines()
+        same_list = [same.replace(" <SameAs>", "").replace("<http://dbpedia.org/","dbp:")[:-4] for same in same_list]
+        for frac in [0.1, 0.2, 0.5]:
+            precisions, recalls, f1_scores, timings = run_experiment(same_as, DB_lines, FB_lines, same_list, frac)
+            print("Finished with fraction {}%. Saving data...".format(frac*100))
+            with open("data/pkl/{}/precisions.pkl".format(frac), "wb") as f:
+                pickle.dump(precisions, f)
+            with open("data/pkl/{}/recalls.pkl".format(frac), "wb") as f:
+                pickle.dump(recalls, f)
+            with open("data/pkl/{}/f1_scores.pkl".format(frac), "wb") as f:
+                pickle.dump(f1_scores, f)
+            with open("data/pkl/{}/timings.pkl".format(frac), "wb") as f:
+                pickle.dump(timings, f)
+        DB.close()
+        FB.close()
+        same_file.close()
+    else:
+        print("Loading precomputed pickle...")
+        # TODO: Do something with loaded data...
+        pass
+            
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Run PARIS entity matching and compute metrics")
+
+    parser.add_argument(
+        "-no_paris", action="store_true", help="Use this flag to avoid running PARIS and load precomputed results from pickle instead. \
+                                                If not set, the full algorithm will be executed 20 times for 3 different seed fractions (10/20/50%). \
+                                                This may require about half an hour.",
+    )
+    args = parser.parse_args()
+    main(args.no_paris)
