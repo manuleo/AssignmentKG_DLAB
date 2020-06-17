@@ -1,9 +1,6 @@
 #!/bin/sh
 
-# remove_cell_tags :: remove all cell
+# USAGE: ./convert.sh notebook_name format output_name
+# Note that the format can be pdf, latex or whatever pandoc accepts.
 
-# remove input, keep output
-
-#remove_input_tags
-
-jupyter nbconvert "test_plots" --to pdf --TagRemovePreprocessor.remove_cell_tags='["hide_cell"]' --TagRemovePreprocessor.remove_input_tags='["hide_input"]' --no-prompt --output report
+jupyter nbconvert $1 --to $2 --TagRemovePreprocessor.remove_cell_tags='["hide_cell"]' --TagRemovePreprocessor.remove_input_tags='["hide_input"]' --no-prompt --output $3
