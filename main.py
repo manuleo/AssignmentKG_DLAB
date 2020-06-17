@@ -13,7 +13,7 @@ def create_label(sample_row):
     return sample_row
 
 def create_sample(same_as, frac):
-    sampled = same_as.sample(frac=frac, replace=True)
+    sampled = same_as.sample(frac=frac, replace=False)   # Create a sample without replacement.
     sampled = sampled.apply(lambda x: create_label(x), axis=1)
     return sampled
 
