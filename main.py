@@ -57,6 +57,15 @@ def check_result(same_list, out_path):
     return precision_dict, recall_dict, f1_dict
 
 def run_experiment(same_as, DB_lines, FB_lines, same_list, frac, n=20):
+    
+    # Create the necessary static directories.
+    if not os.path.isdir("data"):
+        os.mkdir("data")
+    if not os.path.isdir("data/seeded"):
+        os.mkdir("data/seeded")
+    if not os.path.isdir("output"):
+        os.mkdir('output')
+    
     print("Chosen fraction = {}%".format(frac*100))
     timings = []
     precisions = []
@@ -70,6 +79,11 @@ def run_experiment(same_as, DB_lines, FB_lines, same_list, frac, n=20):
         FB_lines_labeled = FB_lines + sampled["FB_labeled"].to_list()
         DB_path = "data/seeded/{frac}/DB_{i}.nt".format(frac = frac, i = i)
         FB_path = "data/seeded/{frac}/FB_{i}.nt".format(frac = frac, i = i)
+
+        # Create the necessary directories if they are not already present.
+        if not os.path.isdir("data/seeded/{frac}".format(frac=frac)):
+            os.mkdir("data/seeded/{frac}".format(frac=frac))
+        
         DB_label = open(DB_path, "w")
         FB_label = open(FB_path, "w")
         DB_label.writelines(DB_lines_labeled)
@@ -78,6 +92,9 @@ def run_experiment(same_as, DB_lines, FB_lines, same_list, frac, n=20):
         out_path = "output/{frac}/{i}".format(frac = frac, i = i)
         if os.path.exists(out_path):
             shutil.rmtree(out_path)
+        
+        if not os.path.isdir("output/{frac}".format(frac=frac)):
+            os.mkdir("output/{frac}".format(frac=frac))
         os.mkdir(out_path)
         print("Running PARIS...")
         out_paris = os.popen("java -jar paris_0_3.jar {FB_path} {DB_path} {out_path}".format(FB_path=FB_path, DB_path=DB_path, out_path=out_path)).read()
