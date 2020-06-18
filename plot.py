@@ -243,11 +243,11 @@ def timings_confidence(seeds, timings):
         mean = np.mean(means_timings)
 
         plt.subplot(1, 3, index)
-        plot_confidence(means_timings, mean, interval,\
-                        "$95.0$ % confidence interval for Timings using 1000 samples",\
-                        "Computed bootstrap means for timings with seed {seed}".format(seed=str(float(s)*100)+"%"))
+        plot_confidence(means_timings, mean, interval,
+                        "$95.0$% confidence interval for\n timings using 1000 samples\n",
+                        "Computed bootstrap means for\n timings with seed {seed}".format(seed=str(float(s)*100)+"%"))
         index += 1 
-    fig.suptitle("Computed confidence intervals for the total timing with different seeds", size=16)
+    fig.suptitle("Computed confidence intervals for the total timing with different seeds", fontsize=16)
     fig.savefig("plots/timings_metric.pdf")
     plt.close()
 
@@ -271,9 +271,10 @@ def last_iter_goodness(seeds, metrics, metrics_names):
             metric_last = [val[last_iter] for val in metrics[m][s]]
             plt.subplot(3, 3, iterator)
             plt.boxplot([metric_last], labels=["{metric} metric - Seed {seed}".format(metric=m.capitalize(), seed=str(float(s)*100)+"%")])
-            plt.ylabel(m.capitalize())
-            plt.title("{} metric behaviour at last iteration".format(m.capitalize()))
+            plt.ylabel(m.capitalize(), fontsize=15)
+            plt.title("{} metric behaviour at last iteration".format(m.capitalize()),
+                      fontsize=15)
             iterator += 1 
-    fig.suptitle("Last iteration goodness for different metric and seeds", y=0.95, size=16)
+    fig.suptitle("Last iteration goodness for different metric and seeds", y=0.95, fontsize=20)
     fig.savefig("plots/last_iter_boxplots.pdf")
     plt.close()
