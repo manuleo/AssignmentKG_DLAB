@@ -17,10 +17,15 @@ def plot(seeds, metrics, metrics_names, timings):
     # Prepare folder to save folder if not existent
     if not os.path.isdir("plots/"):
         os.mkdir("plots/")
+    print("\nProducing plot with mean/std of each metric by iteration")
     mean_per_iter(seeds, metrics, metrics_names)
+    print("\nProducing plot with average time spent for each PARIS run")
     timings_for_seed(seeds, timings)
+    print("\nProducing confidence intervals at 95% for the different metrics (only last iterations of PARIS)")
     metrics_confidence(metrics, metrics_names, seeds)
+    print("\nProducing confidence intervals at 95% for the running time")
     timings_confidence(seeds, timings)
+    print("\nProducing plot to analyze goodness of the different metrics through boxplots (only last iteration of PARIS)")
     last_iter_goodness(seeds, metrics, metrics_names)
 
 
@@ -129,6 +134,8 @@ def metrics_confidence(metrics, metrics_names, seeds):
         for s in seeds:
             means_metric = bootstrap_metric(metrics[m][s], 1000)
             interval = confidence_interval(means_metric, 0.95)
+            print("Confidence interval found for {metric} - Seed {seed}: [{low_inter} - {high_inter}]".format(metric=m.capitalize(), seed=str(float(s)*100)+"%", \
+                                                                                                                low_inter=interval[0], high_inter=interval[1]))
             mean = np.mean(means_metric)
         
             plt.subplot(3, 3, index)
@@ -149,6 +156,8 @@ def timings_confidence(seeds, timings):
     for s in seeds:
         means_timings = bootstrap_metric(timings[s], 1000)
         interval = confidence_interval(means_timings, 0.95)
+        print("Confidence interval found for timings - Seed {seed}: [{low_inter} - {high_inter}]".format(seed=str(float(s)*100)+"%", \
+                                                                                                        low_inter=interval[0], high_inter=interval[1]))
         mean = np.mean(means_timings)
 
         plt.subplot(1, 3, index)
