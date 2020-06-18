@@ -340,9 +340,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run PARIS entity matching and compute metrics")
 
     parser.add_argument(
-        "-no_paris", action="store_true", help="Use this flag to avoid running PARIS and load precomputed results from pickle instead. \
-                                                If not set, the full algorithm will be executed 20 times for 3 different seed fractions (10/20/50%). \
-                                                This may require about half an hour.",
+        "-no_paris", action="store_true", help="Use this flag to avoid running PARIS and load precomputed results from pickle instead."
+                                                "If not set, the full algorithm will be executed 20 times for 3 different seed fractions (10%%/20%%/50%%)."
+                                                "This may require about half an hour."
     )
     parser.add_argument(
         "-plots", action="store_true", help="Produce the same plots as shown in the report and in the notebook and save them to pdf for later use."
