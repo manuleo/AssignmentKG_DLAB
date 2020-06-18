@@ -12,6 +12,9 @@ matplotlib.rcParams.update({
     'pgf.rcfonts': False,
 })
 
+plt.rc('xtick',labelsize=15)
+plt.rc('ytick',labelsize=15)
+
 
 def plot(seeds, metrics, metrics_names, timings):
     """Produce all the plots
@@ -72,7 +75,7 @@ def mean_per_iter(seeds, metrics, metrics_names):
     """
     # Create figure
     title = "{} among the iterations, for different seeds percentages"
-    fig, axarr = plt.subplots(3, 1, figsize=(25,15))
+    fig, axarr = plt.subplots(3, 1, figsize=(10,15))
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=None, hspace=0.5)
     
     # Go over the metric/seed pairs
@@ -80,17 +83,17 @@ def mean_per_iter(seeds, metrics, metrics_names):
         for s in seeds:
             # Create a subplot per metric with errorbar for std
             metric_means, metric_std = compute_mean_and_std_by_metric(metrics[metric][s])
-            axarr[i].set_title(title.format(metric.capitalize()))
+            axarr[i].set_title(title.format(metric.capitalize()), fontsize=18)
             if metric=="precision":
                 axarr[i].set_ylim([0.7,1.01])
             else:
                 axarr[i].set_ylim([0,1])
             axarr[i].set_xticks(range(10))
-            axarr[i].set_xlabel("Iteration")
-            axarr[i].set_ylabel(metric.capitalize())
+            axarr[i].set_xlabel("Iteration", fontsize=14)
+            axarr[i].set_ylabel(metric.capitalize(), fontsize=14)
             axarr[i].errorbar(range(len(metric_means)), metric_means, yerr=metric_std, label=str(float(s)*100)+"%")
         axarr[i].legend(title="Seed")
-    fig.suptitle("Metrics behaviour among the iterations", y=0.95, size=16)
+    fig.suptitle("Metrics behaviour among the iterations", y=0.95, fontsize=16)
     # Save
     fig.savefig("plots/mean_metric_per_iter.pdf")
     plt.close()
@@ -104,12 +107,13 @@ def timings_for_seed(seeds, timings):
         timings (dict): dict of list of timings for each seed
     """
     # Create one box for each seed percentage and save
-    plt.figure(figsize=(15,8))
-    plt.title("Time measuration per experiment", size=16)
+    plt.figure(figsize=(10,7))
+    plt.title("Time measuration per experiment", fontsize=20)
     plt.boxplot([timings[s] for s in seeds], labels=[str(float(s)*100)+"% Seed" for s in seeds])
-    plt.ylabel("Timing measurement from PARIS $[ ms ]$")
-    plt.xlabel("Chosen seed percentage")
+    plt.ylabel("Timing measurement from PARIS $[ ms ]$", fontsize=14)
+    plt.xlabel("Chosen seed percentage", fontsize=14)
     plt.savefig("plots/timings_per_seed.pdf")
+    plt.tick_params(labelsize=10)
     plt.close()
 
 
@@ -180,9 +184,9 @@ def plot_confidence(means_metric, mean, interval, title, xlabel):
     plt.axvline(interval[1], color='k', linestyle='dashed', linewidth=1)
     plt.axvline(mean, color='r', linestyle='dashed', linewidth=1)
 
-    plt.title(title)
-    plt.xlabel(xlabel)
-    plt.ylabel("Count")
+    plt.title(title, fontsize=14)
+    plt.xlabel(xlabel, fontsize=15)
+    plt.ylabel("Count", fontsize=15)
 
 
 def metrics_confidence(metrics, metrics_names, seeds):
@@ -206,11 +210,17 @@ def metrics_confidence(metrics, metrics_names, seeds):
             mean = np.mean(means_metric)
         
             plt.subplot(3, 3, index)
-            plot_confidence(means_metric, mean, interval,\
-                            "$95.0$ % confidence interval for {metric} with 1000 samples, seed {seed}".format(metric=m.capitalize(), seed = str(float(s)*100)+"%"),\
-                            "Computed bootstrap means for {metric} with seed {seed}".format(metric=m, seed=str(float(s)*100)+"%"))
+            plot_confidence(means_metric,
+                            mean,
+                            interval,
+                            "$95.0$ % confidence interval for {metric}\n with 1000 samples, seed {seed}".format(
+                                metric=m.capitalize(), seed = str(float(s)*100)+"%"),\
+                            "Computed bootstrap means for {metric} with seed {seed}".format(
+                                metric=m, seed=str(float(s)*100)+"%"))
             index += 1 
-    fig.suptitle("Computed confidence intervals at the last iteration, for different seeds/metrics", y = 0.95, size=16)
+    fig.suptitle("Computed confidence intervals at the last iteration, for different seeds/metrics",
+                 y = 0.95,
+                 fontsize=20)
     fig.savefig("plots/confidence_metric.pdf")
     plt.close()
 
