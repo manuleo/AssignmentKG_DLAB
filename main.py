@@ -3,6 +3,7 @@ import numpy as np
 import os, shutil
 import argparse
 import pickle
+from plot import plot
 
 def create_label(sample_row):
     label = sample_row["DB"].split("/")[-1].replace(">","")
@@ -154,8 +155,26 @@ def main(no_paris):
         same_file.close()
     else:
         print("Loading precomputed pickle...")
-        # TODO: Do something with loaded data...
-        pass
+        # Read results from pickles
+        seeds = ['0.1', '0.2', '0.5']
+        metrics_names = ['precision', 'recall', 'f1_score']
+        metrics = {}
+        timings = {}
+
+        for m in metrics_names:
+            metrics[m] = {}
+        for s in seeds:
+            with open("data/pkl/{seed}/precisions.pkl".format(seed=s), "rb") as f:
+                metrics['precision'][s] = pickle.load(f)
+            with open("data/pkl/{seed}/recalls.pkl".format(seed=s), "rb") as f:
+                metrics['recall'][s] = pickle.load(f)
+            with open("data/pkl/{seed}/f1_scores.pkl".format(seed=s), "rb") as f:
+                metrics['f1_score'][s] = pickle.load(f)
+            with open("data/pkl/{seed}/timings.pkl".format(seed=s), "rb") as f:
+                timings[s] = pickle.load(f)
+        
+        plot(seeds, metrics, metrics_names, timings)
+        
             
 
 
