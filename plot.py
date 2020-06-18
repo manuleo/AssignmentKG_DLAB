@@ -114,14 +114,24 @@ def timings_for_seed(seeds, timings):
 
 
 def bootstrap_metric(metric_list, n_iter):
-    """Compute bootstrap means list to be used for computing confidence intervals
-        using bootstrap resample"""
+    """Compute bootstrap means list for a metric to be used for computing confidence intervals
+        using bootstrap resample
+    Args:
+        metric_list (list): The list (in the case of timings) or list of dicts of the given metric
+        n_iter (int): number of sample to do for bootstrap
+
+    Returns:
+        means (list): list of n_iter means computed from the samples
+    """
     means = []
+    # For the Precision/Recall/F1 metrics use only the last iteration, for timings we don't have to consider this case
     if type(metric_list[0]) is dict:
         last_iter = max(metric_list[0].keys())
         metric_last = [val[last_iter] for val in metric_list]
     else:
         metric_last = metric_list
+    
+    # Resample and compute mean
     for _ in range(n_iter):
         # Bootstrap
         metric_sample = np.random.choice(metric_last, size=len(metric_last), replace=True)
@@ -131,6 +141,15 @@ def bootstrap_metric(metric_list, n_iter):
 
 
 def confidence_interval(means, conf_percent):
+    """Get confidence intervals for the given percentage by getting the quantiles
+
+    Args:
+        means (list): list of means computed from the samples
+        conf_percent (float): Percentage for the confidence interval (between 0-1)
+
+    Returns:
+        [lower, upper] (list): the lower and upper bound of the confidence interval
+    """
     # Computing low quantile 
     low_p = ((1.0 - conf_percent) / 2.0) * 100
     lower = np.percentile(means, low_p)
@@ -143,11 +162,20 @@ def confidence_interval(means, conf_percent):
 
 
 def plot_confidence(means_metric, mean, interval, title, xlabel):
+    """Plot a histogram with the confidence interval
+
+    Args:
+        means_metric (list): list of means computed from the samples
+        mean (float): mean of the list
+        interval (list): the lower and upper bound of the confidence interval
+        title (str): Title for the plot
+        xlabel (str): Label for the x axis
+    """
     
-    # Plot scores
+    # Plot the means
     plt.hist(means_metric, bins=25)
 
-    # Plot of two interval lines
+    # Plot of two interval lines + mean line
     plt.axvline(interval[0], color='k', linestyle='dashed', linewidth=1)
     plt.axvline(interval[1], color='k', linestyle='dashed', linewidth=1)
     plt.axvline(mean, color='r', linestyle='dashed', linewidth=1)
@@ -158,12 +186,21 @@ def plot_confidence(means_metric, mean, interval, title, xlabel):
 
 
 def metrics_confidence(metrics, metrics_names, seeds):
+    """Compute and plot confidence interval at 95% for Precision, Recall and F1 score
+
+    Args:
+        metrics (dict): dict of metrics performances
+        metrics_names (list): list of computed metrics
+        seeds (list): list of seed used
+    """
+    # Create plot
     index = 1
     fig, _ = plt.subplots(3, 3, figsize=(20, 15))
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.5, hspace=0.35)
 
     for m in metrics_names:
         for s in seeds:
+            # Compute interval for the metric/seed pair and plot them 
             means_metric = bootstrap_metric(metrics[m][s], 1000)
             interval = confidence_interval(means_metric, 0.95)
             print("Confidence interval found for {metric} - Seed {seed}: [{low_inter} - {high_inter}]".format(metric=m.capitalize(), seed=str(float(s)*100)+"%", \
@@ -181,11 +218,18 @@ def metrics_confidence(metrics, metrics_names, seeds):
 
 
 def timings_confidence(seeds, timings):
+    """Compute and plot confidence interval at 95% for the total timing
+
+    Args:
+        seeds (list): list of seed used
+        timings (dict): dict of list of timings for each seed
+    """
     index = 1
     fig, _ = plt.subplots(1, 3, figsize=(17, 10))
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.2, hspace=0.35)
 
     for s in seeds:
+        # Compute interval for the given seed and plot it
         means_timings = bootstrap_metric(timings[s], 1000)
         interval = confidence_interval(means_timings, 0.95)
         print("Confidence interval found for timings - Seed {seed}: [{low_inter} - {high_inter}]".format(seed=str(float(s)*100)+"%", \
@@ -202,12 +246,21 @@ def timings_confidence(seeds, timings):
     plt.close()
 
 def last_iter_goodness(seeds, metrics, metrics_names):
+    """Create boxplot to analyze the behaviour of the different metrics (Precision, Recall, F1 score) at the last iteration
+
+    Args:
+        seeds (list): list of seed used
+        metrics (dict): dict of metrics performances
+        metrics_names (list): list of computed metrics
+    """
+    # Create plot
     fig, _ = plt.subplots(3, 3, figsize=(20, 12))
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.25, hspace=0.25)
 
     iterator = 1
     for m in metrics_names:
         for s in seeds:
+            # Create a boxplot for each combination Metric/Seed
             last_iter = max(metrics[m][s][0].keys())
             metric_last = [val[last_iter] for val in metrics[m][s]]
             plt.subplot(3, 3, iterator)
