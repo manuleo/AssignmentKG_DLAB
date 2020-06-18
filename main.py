@@ -219,6 +219,34 @@ def run_experiment(same_as, DB_lines, FB_lines, same_list, frac, n=20):
 
     return precisions, recalls, f1_scores, timings
 
+def load_pickles():
+    """Load the computed pickles
+
+    Returns:
+        seeds (list): list of seed used
+        metrics (dict): dict of metrics performances
+        metrics_names (list): list of computed metrics
+        timings (dict): dict of list of timings for each seed
+    """
+    seeds = ['0.1', '0.2', '0.5']
+    metrics_names = ['precision', 'recall', 'f1_score']
+    metrics = {}
+    timings = {}
+
+    # Load the result
+    for m in metrics_names:
+        metrics[m] = {}
+    for s in seeds:
+        with open("data/pkl/{seed}/precisions.pkl".format(seed=s), "rb") as f:
+            metrics['precision'][s] = pickle.load(f)
+        with open("data/pkl/{seed}/recalls.pkl".format(seed=s), "rb") as f:
+            metrics['recall'][s] = pickle.load(f)
+        with open("data/pkl/{seed}/f1_scores.pkl".format(seed=s), "rb") as f:
+            metrics['f1_score'][s] = pickle.load(f)
+        with open("data/pkl/{seed}/timings.pkl".format(seed=s), "rb") as f:
+            timings[s] = pickle.load(f)
+        
+    return seeds, metrics, metrics_names, timings
 
 
 def main(no_paris, plots):
@@ -261,25 +289,14 @@ def main(no_paris, plots):
         DB.close()
         FB.close()
         same_file.close()
+
+        # Reload pickles to be consistent with the directly load case
+        seeds, metrics, metrics_names, timings = load_pickles()
+
     else:
         print("Loading precomputed pickle...")
         # Read results from pickles
-        seeds = ['0.1', '0.2', '0.5']
-        metrics_names = ['precision', 'recall', 'f1_score']
-        metrics = {}
-        timings = {}
-
-        for m in metrics_names:
-            metrics[m] = {}
-        for s in seeds:
-            with open("data/pkl/{seed}/precisions.pkl".format(seed=s), "rb") as f:
-                metrics['precision'][s] = pickle.load(f)
-            with open("data/pkl/{seed}/recalls.pkl".format(seed=s), "rb") as f:
-                metrics['recall'][s] = pickle.load(f)
-            with open("data/pkl/{seed}/f1_scores.pkl".format(seed=s), "rb") as f:
-                metrics['f1_score'][s] = pickle.load(f)
-            with open("data/pkl/{seed}/timings.pkl".format(seed=s), "rb") as f:
-                timings[s] = pickle.load(f)
+        seeds, metrics, metrics_names, timings = load_pickles()
         print("All pickles loaded!")
         
     if plots:

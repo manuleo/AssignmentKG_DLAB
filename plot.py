@@ -3,7 +3,7 @@ import matplotlib
 import os
 import numpy as np
 
-#Set the style for latex-like plots
+# Set the style for latex-like plots -> Note that this requires LaTeX installed on the machine, otherwise you will get an exception
 matplotlib.use("pgf")
 matplotlib.rcParams.update({
     "pgf.texsystem": "pdflatex",
@@ -14,9 +14,19 @@ matplotlib.rcParams.update({
 
 
 def plot(seeds, metrics, metrics_names, timings):
+    """Produce all the plots
+
+    Args:
+        seeds (list): list of seed used
+        metrics (dict): dict of metrics performances
+        metrics_names (list): list of computed metrics
+        timings (dict): dict of list of timings for each seed
+    """
     # Prepare folder to save folder if not existent
     if not os.path.isdir("plots/"):
         os.mkdir("plots/")
+    
+    # Create the plots
     print("\nProducing plot with mean/std of each metric by iteration")
     mean_per_iter(seeds, metrics, metrics_names)
     print("\nProducing plot with average time spent for each PARIS run")
@@ -29,20 +39,23 @@ def plot(seeds, metrics, metrics_names, timings):
     last_iter_goodness(seeds, metrics, metrics_names)
 
 
-def compute_mean_and_std_by_metric(metric: list):
+def compute_mean_and_std_by_metric(metric):
     """
     Compute the mean and the standard deviation for each metric,
     grouped by every iteration of the algorithm.
     
-    Arguments:
-        metric: the name of the metric, among 'precision', 'recall' and 'f1_score' 
+    Args:
+        metric (list): the name of the metric, among 'precision', 'recall' and 'f1_score' 
     Returns:
-        
+        metric_means (list): mean of the metric by iteration
+        metric_stds (list): std of the metric by iteration
     """
     metric_means = []
-    metric_stds = []   
+    metric_stds = []
+    # Get last iteration number
     last_iter = max(metric[0].keys()) + 1
     for i in range(last_iter):
+        # Create a list of the values for iteration and compute mean/std
         iter_values = [val[i] for val in metric]
         metric_means.append(np.mean(iter_values))
         metric_stds.append(np.std(iter_values))
@@ -50,11 +63,22 @@ def compute_mean_and_std_by_metric(metric: list):
 
 
 def mean_per_iter(seeds, metrics, metrics_names):
+    """Produce the plot with the mean of each metric by iteration and std
+
+    Args:
+        seeds (list): list of seed used
+        metrics (dict): dict of metrics performances
+        metrics_names (list): list of computed metrics
+    """
+    # Create figure
     title = "{} among the iterations, for different seeds percentages"
     fig, axarr = plt.subplots(3, 1, figsize=(25,15))
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=None, hspace=0.5)
+    
+    # Go over the metric/seed pairs
     for i, metric in enumerate(metrics_names):
         for s in seeds:
+            # Create a subplot per metric with errorbar for std
             metric_means, metric_std = compute_mean_and_std_by_metric(metrics[metric][s])
             axarr[i].set_title(title.format(metric.capitalize()))
             if metric=="precision":
@@ -67,11 +91,19 @@ def mean_per_iter(seeds, metrics, metrics_names):
             axarr[i].errorbar(range(len(metric_means)), metric_means, yerr=metric_std, label=str(float(s)*100)+"%")
         axarr[i].legend(title="Seed")
     fig.suptitle("Metrics behaviour among the iterations", y=0.95, size=16)
+    # Save
     fig.savefig("plots/mean_metric_per_iter.pdf")
     plt.close()
 
 
 def timings_for_seed(seeds, timings):
+    """Create boxplot with timings
+
+    Args:
+        seeds (list): list of seed used
+        timings (dict): dict of list of timings for each seed
+    """
+    # Create one box for each seed percentage and save
     plt.figure(figsize=(15,8))
     plt.title("Time measuration per experiment", size=16)
     plt.boxplot([timings[s] for s in seeds], labels=[str(float(s)*100)+"% Seed" for s in seeds])
