@@ -3,7 +3,7 @@ import numpy as np
 import os, shutil
 import argparse
 import pickle
-from plot import plot
+from plot import plot, compute_mean_and_std_by_metric, bootstrap_metric, confidence_interval
 
 def create_label(sample_row):
     """Create a label for each dataset, given a SameAs row
@@ -248,7 +248,6 @@ def load_pickles():
         
     return seeds, metrics, metrics_names, timings
 
-
 def main(no_paris, plots):
     """Main function to run experiment on PARIS and produce plots
 
@@ -298,6 +297,32 @@ def main(no_paris, plots):
         # Read results from pickles
         seeds, metrics, metrics_names, timings = load_pickles()
         print("All pickles loaded!")
+
+    # Print the aggregated metrics
+    for metric in metrics_names:
+        print("\nMetric: {}".format(metric.capitalize()))
+        for s in seeds:
+            metric_means, metric_stds = compute_mean_and_std_by_metric(metrics[metric][s])
+            metric_mean, metric_std = metric_means.pop(), metric_stds.pop()
+            # Print mean and std of the metric for the given seed (only last iteration printed for simplicity)
+            print("    Seed:", str(float(s)*100)+"%")
+            print("        Last Iteration Mean:", metric_mean)
+            print("        Last Iteration Std:", metric_std)
+            means_metric = bootstrap_metric(metrics[metric][s], 1000)
+            interval = confidence_interval(means_metric, 0.95)
+            print("        Last Iteration Confidence interval: [{low_inter} - {high_inter}]".format(low_inter=interval[0], high_inter=interval[1]))
+    # Print mean and std of timings
+    print("\nMetric: Running Time")
+    for s in seeds:
+        print("    Seed:", str(float(s)*100)+"%")
+        mean_timings = np.mean(timings[s])
+        std_timings = np.std(timings[s])
+        print("        Mean (s):", mean_timings/1000)
+        print("        Std  (s):", std_timings/1000)
+        means_timings = bootstrap_metric(timings[s], 1000)
+        interval = confidence_interval(means_timings, 0.95)
+        print("        Confidence interval (s): [{low_inter} - {high_inter}]".format(low_inter=interval[0]/1000, high_inter=interval[1]/1000))
+
         
     if plots:
         print("\nStart saving plots")
@@ -320,8 +345,7 @@ if __name__ == "__main__":
                                                 This may require about half an hour.",
     )
     parser.add_argument(
-        "-plots", action="store_true", help="Produce the same plots as shown in the report and in the notebook and save them to pdf for later use. \
-                                             Note that you must produce the plots if you want to have the 95% confidence intervals",
+        "-plots", action="store_true", help="Produce the same plots as shown in the report and in the notebook and save them to pdf for later use."
     )
 
     args = parser.parse_args()

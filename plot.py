@@ -203,8 +203,6 @@ def metrics_confidence(metrics, metrics_names, seeds):
             # Compute interval for the metric/seed pair and plot them 
             means_metric = bootstrap_metric(metrics[m][s], 1000)
             interval = confidence_interval(means_metric, 0.95)
-            print("Confidence interval found for {metric} - Seed {seed}: [{low_inter} - {high_inter}]".format(metric=m.capitalize(), seed=str(float(s)*100)+"%", \
-                                                                                                                low_inter=interval[0], high_inter=interval[1]))
             mean = np.mean(means_metric)
         
             plt.subplot(3, 3, index)
@@ -232,8 +230,6 @@ def timings_confidence(seeds, timings):
         # Compute interval for the given seed and plot it
         means_timings = bootstrap_metric(timings[s], 1000)
         interval = confidence_interval(means_timings, 0.95)
-        print("Confidence interval found for timings - Seed {seed}: [{low_inter} - {high_inter}]".format(seed=str(float(s)*100)+"%", \
-                                                                                                        low_inter=interval[0], high_inter=interval[1]))
         mean = np.mean(means_timings)
 
         plt.subplot(1, 3, index)
