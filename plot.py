@@ -233,8 +233,8 @@ def timings_confidence(seeds, timings):
         timings (dict): dict of list of timings for each seed
     """
     index = 1
-    fig, _ = plt.subplots(1, 3, figsize=(17, 10))
-    plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.2, hspace=0.35)
+    fig, _ = plt.subplots(1, 3, figsize=(10, 8))
+    plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.3, hspace=0.35)
 
     for s in seeds:
         # Compute interval for the given seed and plot it
