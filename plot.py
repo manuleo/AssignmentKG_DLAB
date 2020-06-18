@@ -184,9 +184,9 @@ def plot_confidence(means_metric, mean, interval, title, xlabel):
     plt.axvline(interval[1], color='k', linestyle='dashed', linewidth=1)
     plt.axvline(mean, color='r', linestyle='dashed', linewidth=1)
 
-    plt.title(title, fontsize=14)
-    plt.xlabel(xlabel, fontsize=15)
-    plt.ylabel("Count", fontsize=15)
+    plt.title(title, fontsize=10)
+    plt.xlabel(xlabel, fontsize=10)
+    plt.ylabel("Count", fontsize=10)
 
 
 def metrics_confidence(metrics, metrics_names, seeds):
@@ -199,7 +199,7 @@ def metrics_confidence(metrics, metrics_names, seeds):
     """
     # Create plot
     index = 1
-    fig, _ = plt.subplots(3, 3, figsize=(20, 15))
+    fig, _ = plt.subplots(3, 3, figsize=(10, 15))
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.5, hspace=0.35)
 
     for m in metrics_names:
@@ -215,7 +215,7 @@ def metrics_confidence(metrics, metrics_names, seeds):
                             interval,
                             "$95.0$ % confidence interval for {metric}\n with 1000 samples, seed {seed}".format(
                                 metric=m.capitalize(), seed = str(float(s)*100)+"%"),\
-                            "Computed bootstrap means for {metric} with seed {seed}".format(
+                            "Computed bootstrap means for\n {metric} with seed {seed}".format(
                                 metric=m, seed=str(float(s)*100)+"%"))
             index += 1 
     fig.suptitle("Computed confidence intervals at the last iteration, for different seeds/metrics",
