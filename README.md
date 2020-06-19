@@ -27,11 +27,11 @@ We provide a notebook `Analysis.ipynb` with disclosed output with all the plots 
 ```
 Optional arguments:
   -h, --help  show this help message and exit
-  -no_paris   Use this flag to avoid running PARIS and load precomputed
+  --no_paris   Use this flag to avoid running PARIS and load precomputed
               results from pickle instead. If not set, the full algorithm will
               be executed 20 times for 3 different seed fractions
               (10%/20%/50%).This may require about an hour.
-  -plots      Produce the same plots as shown in the report and in the
+  --plots      Produce the same plots as shown in the report and in the
               notebook and save them to pdf for later use.
 ```
 Whatever your choice, aggregated metrics for the last iteration only and 95% confidence interval will be computed. If you choose to run the complete PARIS algorithm intermediate metrics for each run will be printed to the console.
