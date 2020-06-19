@@ -22,7 +22,7 @@ We provide a notebook `Analysis.ipynb` with disclosed output with all the plots 
 
 ## Usage instruction
 1. Open CMD/Bash
-2. Move to the root folder of the unzipped zip, where the `main.py` is located
+2. Move to the root folder, where the `main.py` is located
 3. Execute the command ```python3 main.py```, eventually adding one or more of the following arguments:
 ```
 Optional arguments:
