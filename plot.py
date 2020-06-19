@@ -218,6 +218,7 @@ def metrics_confidence(metrics, metrics_names, seeds):
             mean[s] = np.mean(means_metric[s])
             max_interval = max(max_interval, 
                             max(means_metric[s]) - min(means_metric[s]))
+        max_interval += max_interval/5
         for s in seeds:
             # Compute interval for the metric/seed pair and plot them 
             
@@ -259,6 +260,7 @@ def timings_confidence(seeds, timings):
         mean[s] = np.mean(means_timings[s])
         max_interval = max(max_interval, 
                             max(means_timings[s]) - min(means_timings[s]))
+    max_interval += max_interval/5
     for s in seeds:
         # Compute interval for the given seed and plot it
         
