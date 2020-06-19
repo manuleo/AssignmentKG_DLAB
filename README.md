@@ -56,7 +56,7 @@ Whatever your choice, aggregated metrics for the last iteration only and 95% con
     │   |     |    ├── recalls.pkl
     |   |     |    └── timings.pkl
     │   |     └── 0.5 
-    |   |       ├── f1_scores.pkl
+    |   |          ├── f1_scores.pkl
     |   |          ├── precisions.pkl
     │   |          ├── recalls.pkl
     |   |          └── timings.pkl
