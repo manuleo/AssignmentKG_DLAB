@@ -1,9 +1,9 @@
 # PARIS - Knowledge Graph Alignment
 
 ## Introduction
-This assignment aim to analyze the performance of **PARIS**, a framework for Knowledge Graph (KG) Alignment (and more), based on a probablistic method. Specifically, we test it against two small KGs (FB15k and DB15k) and analyze what fraction of the real alignment PARIS gets right. In order to do so, Precision, Recall, F1 score and total running time are computed and elaborated. This README enables to easily run our evaluation code to produce the same results we achieved (some small difference are acceptable during the intrinsic randomization).
+This assignment aims to analyze the performance of **PARIS**, a framework for Knowledge Graph (KG) Alignment (and more), based on a probabilistic method. Specifically, we test it against two small KGs (FB15k and DB15k) and analyze what fraction of the real alignment PARIS gets right. In order to do so, Precision, Recall, F1 score, and total running time are computed and elaborated. This README enables to easily run our evaluation code to produce the same results we achieved (some small difference are acceptable during the intrinsic randomization).
 
-## Prerequites
+## Prerequisites
 The minimum requirements for the `main.py` are:
 - `Python` (tested on version **_3.8.2_**)
 - [pip](https://pip.pypa.io/en/stable/) (tested on version *20.1.1*) (For package installation, if needed)
@@ -12,11 +12,11 @@ The minimum requirements for the `main.py` are:
 - `matplotlib` (tested on version *3.1.3*)
 
 ### Note about the plots
-We used a LaTeX backend for our plots so that they have a "LaTeX style" and we can use its syntax for axes labeling, titles and anything else. If you want to reproduce the plots (using the `-plots` flag, see *Usage instruction* below), you will need to have LaTeX installed locally on your machine. The installation really depends on your OS, so we recommend to go to [LaTeX official website](https://www.latex-project.org/get/) for more information. 
-For Linux users, we recommend to use `apt-get` to install. We installed the full version on our machines (Note that this version is around 6GB big):
+We used a LaTeX backend for our plots so that they have a "LaTeX style" and we can use its syntax for axes labeling, titles, and anything else. If you want to reproduce the plots (using the `-plots` flag, see *Usage instruction* below), you will need to have LaTeX installed locally on your machine. The installation really depends on your OS, so we recommend to go to [LaTeX official website](https://www.latex-project.org/get/) for more information. 
+For Linux users, we recommend using `apt-get` to install. We installed the full version on our machines (Note that this version is around 6GB big):
 
     sudo apt-get install texlive-full
-You can try smaller version if you don't have enough space, but after that you may get some missing LaTeX packets, so Google for them is the best choice.
+You can try a smaller version if you don't have enough space, but after that, you may get some missing LaTeX packets, so Google for them is the best choice.
 #### What you can do instead 
 We provide a notebook `Analysis.ipynb` with disclosed output with all the plots we produce in the report and in the `main.py`. If you don't want to install LaTeX you can go over this notebook to see how the plots have been generated (*Note*: that might be some small differences in how these plots are done, especially regarding the figure size). This notebook provide also the same aggregated metrics you can obtain by running the script.
 
@@ -56,7 +56,7 @@ Whatever your choice, aggregated metrics for the last iteration only and 95% con
     │   |     |    ├── recalls.pkl
     |   |     |    └── timings.pkl
     │   |     └── 0.5 
-    |   |	   ├── f1_scores.pkl
+    |   |       ├── f1_scores.pkl
     |   |          ├── precisions.pkl
     │   |          ├── recalls.pkl
     |   |          └── timings.pkl
@@ -76,10 +76,11 @@ Whatever your choice, aggregated metrics for the last iteration only and 95% con
     └── README.md
 
 ```
+*Note*: additional folders will be created during the code execution to store PARIS intermediate results and seeded N-Triples dataset. These folders are not showed here as they are not necessary to start the algorithm (The script will create them) and they will be overwritten at each run.
 
 ## Code reproducibility
-Due to the probablistic nature of PARIS, together with the random seed generation, the user is advised that **some small difference are possible among different runs**. However, we found PARIS to be a very stable algorithm so the overall conclusion remains the same.
-*Our configuration*: especially for the timing analysis, is important to consider the configuration we used to run our experiments. That is a Lenovo Thinkpad T450s with **12GB RAM** and Intel **I7-5600U CPU**
+Due to the probabilistic nature of PARIS, together with the random seed generation, the user is advised that **some small differences are possible among different runs**. However, we found PARIS to be a very stable algorithm so the overall conclusion remains the same.
+*Our configuration*: especially for the timing analysis, it is important to consider the configuration we used to run our experiments. That is a Lenovo Thinkpad T450s with **12GB RAM** and Intel **I7-5600U CPU**
 
 ## Authors
 - Manuel Leone
