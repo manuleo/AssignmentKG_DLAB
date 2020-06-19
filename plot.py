@@ -165,7 +165,7 @@ def confidence_interval(means, conf_percent):
     return [lower, upper]
 
 
-def plot_confidence(means_metric, mean, interval, title, xlabel):
+def plot_confidence(means_metric, mean, interval, max_interval, title, xlabel):
     """Plot a histogram with the confidence interval
 
     Args:
@@ -184,6 +184,11 @@ def plot_confidence(means_metric, mean, interval, title, xlabel):
     plt.axvline(interval[1], color='k', linestyle='dashed', linewidth=1)
     plt.axvline(mean, color='r', linestyle='dashed', linewidth=1)
 
+    interv = max(means_metric) - min(means_metric)
+    lower_limit = min(means_metric) - (max_interval - interv) / 2
+    upper_limit = max(means_metric) + (max_interval - interv) / 2
+    plt.xlim((lower_limit, upper_limit))
+    
     plt.title(title, fontsize=10)
     plt.xlabel(xlabel, fontsize=10)
     plt.ylabel("Count", fontsize=10)
@@ -203,16 +208,24 @@ def metrics_confidence(metrics, metrics_names, seeds):
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.5, hspace=0.35)
 
     for m in metrics_names:
+        means_metric = {}
+        interval = {}
+        mean = {}
+        max_interval = 0
+        for s in seeds:
+            means_metric[s] = bootstrap_metric(metrics[m][s], 1000)
+            interval[s] = confidence_interval(means_metric[s], 0.95)
+            mean[s] = np.mean(means_metric[s])
+            max_interval = max(max_interval, 
+                            max(means_metric[s]) - min(means_metric[s]))
         for s in seeds:
             # Compute interval for the metric/seed pair and plot them 
-            means_metric = bootstrap_metric(metrics[m][s], 1000)
-            interval = confidence_interval(means_metric, 0.95)
-            mean = np.mean(means_metric)
-        
+            
             plt.subplot(3, 3, index)
-            plot_confidence(means_metric,
-                            mean,
-                            interval,
+            plot_confidence(means_metric[s],
+                            mean[s],
+                            interval[s],
+                            max_interval,
                             "$95.0$ % confidence interval for {metric}\n with 1000 samples, seed {seed}".format(
                                 metric=m.capitalize(), seed = str(float(s)*100)+"%"),\
                             "Computed bootstrap means for\n {metric} with seed {seed}".format(
@@ -236,14 +249,22 @@ def timings_confidence(seeds, timings):
     fig, _ = plt.subplots(1, 3, figsize=(10, 8))
     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.3, hspace=0.35)
 
+    means_timings = {}
+    interval = {}
+    mean = {}
+    max_interval = 0
+    for s in seeds:
+        means_timings[s] = bootstrap_metric(timings[s], 1000)
+        interval[s] = confidence_interval(means_timings[s], 0.95)
+        mean[s] = np.mean(means_timings[s])
+        max_interval = max(max_interval, 
+                            max(means_timings[s]) - min(means_timings[s]))
     for s in seeds:
         # Compute interval for the given seed and plot it
-        means_timings = bootstrap_metric(timings[s], 1000)
-        interval = confidence_interval(means_timings, 0.95)
-        mean = np.mean(means_timings)
+        
 
         plt.subplot(1, 3, index)
-        plot_confidence(means_timings, mean, interval,
+        plot_confidence(means_timings[s], mean[s], interval[s], max_interval,
                         "$95.0$% confidence interval for\n timings using 1000 samples\n",
                         "Computed bootstrap means for\n timings with seed {seed}".format(seed=str(float(s)*100)+"%"))
         index += 1 
