@@ -13,7 +13,7 @@ The minimum requirements for the `main.py` are:
 
 ### Note about the plots
 We used a LaTeX backend for our plots so that they have a "LaTeX style" and we can use its syntax for axes labeling, titles, and anything else. If you want to reproduce the plots (using the `-plots` flag, see *Usage instruction* below), you will need to have LaTeX installed locally on your machine. The installation really depends on your OS, so we recommend to go to [LaTeX official website](https://www.latex-project.org/get/) for more information. 
-For Linux users, we recommend using `apt-get` to install. We installed the full version on our machines (Note that this version is around 6GB big):
+For Ubuntu users, we recommend using `apt-get` to install. We installed the full version on our machines (Note that this version is around 6GB big):
 
     sudo apt-get install texlive-full
 You can try a smaller version if you don't have enough space, but after that, you may get some missing LaTeX packets, so Google for them is the best choice.
