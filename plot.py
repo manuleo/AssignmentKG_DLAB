@@ -260,8 +260,8 @@ def last_iter_goodness(seeds, metrics, metrics_names):
         metrics_names (list): list of computed metrics
     """
     # Create plot
-    fig, _ = plt.subplots(3, 3, figsize=(20, 12))
-    plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.25, hspace=0.25)
+    fig, _ = plt.subplots(3, 3, figsize=(10, 12))
+    plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.4, hspace=0.5)
 
     iterator = 1
     for m in metrics_names:
@@ -272,7 +272,7 @@ def last_iter_goodness(seeds, metrics, metrics_names):
             plt.subplot(3, 3, iterator)
             plt.boxplot([metric_last], labels=["{metric} metric - Seed {seed}".format(metric=m.capitalize(), seed=str(float(s)*100)+"%")])
             plt.ylabel(m.capitalize(), fontsize=15)
-            plt.title("{} metric behaviour at last iteration".format(m.capitalize()),
+            plt.title("{} metric behaviour\n at last iteration".format(m.capitalize()),
                       fontsize=15)
             iterator += 1 
     fig.suptitle("Last iteration goodness for different metric and seeds", y=0.95, fontsize=20)
