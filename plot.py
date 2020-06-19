@@ -265,13 +265,30 @@ def last_iter_goodness(seeds, metrics, metrics_names):
 
     iterator = 1
     for m in metrics_names:
+        # We want to share for the same metric the same y scale, so that the standard deviation
+        # is visible graphically (otherwise all y scales adapt to the size of the boxplot).
+        max_interval = 0    # Compute the max_interval: initially set to zero, so that it can always improve
+        for s in seeds:
+            last_iter = max(metrics[m][s][0].keys())
+            metric_last = [val[last_iter] for val in metrics[m][s]]
+            max_interval = max(max_interval,      # Update the max_interval
+                               max(metric_last) - min(metric_last))
+        # Add to the max interval a small fraction, so that the bigger interval box plot does not 
+        # fill entirely the y axis (just for graphical purposes). 1/5 is just a good number.
+        max_interval += max_interval / 5   
         for s in seeds:
             # Create a boxplot for each combination Metric/Seed
             last_iter = max(metrics[m][s][0].keys())
             metric_last = [val[last_iter] for val in metrics[m][s]]
+            limit_bottom = min(metric_last)
+            limit_top = max(metric_last)
+            interval = limit_top - limit_bottom
+            limit_bottom = limit_bottom - (max_interval - interval)/2
+            limit_top = limit_top + (max_interval - interval)/2
             plt.subplot(3, 3, iterator)
             plt.boxplot([metric_last], labels=["{metric} metric - Seed {seed}".format(metric=m.capitalize(), seed=str(float(s)*100)+"%")])
             plt.ylabel(m.capitalize(), fontsize=15)
+            plt.ylim((limit_bottom, limit_top))
             plt.title("{} metric behaviour\n at last iteration".format(m.capitalize()),
                       fontsize=15)
             iterator += 1 
