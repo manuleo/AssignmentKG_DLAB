@@ -46,26 +46,26 @@ Whatever your choice, aggregated metrics for the last iteration only and 95% con
     │   |     └── DB15K_SameAsLink.txt
     │   ├── pkl                                # Precomputed pickles for all the possible seeds
     |   |     ├── 0.1 
-	|   |	  |    ├── f1_scores.pkl
+    |   |     |    ├── f1_scores.pkl
     |   |     |    ├── precisions.pkl
     │   |     |    ├── recalls.pkl
     |   |     |    └── timings.pkl
     │   |     ├── 0.2 
-	|   |	  |    ├── f1_scores.pkl
+    |   |     |    ├── f1_scores.pkl
     |   |     |    ├── precisions.pkl
     │   |     |    ├── recalls.pkl
     |   |     |    └── timings.pkl
     │   |     └── 0.5 
-	|   |	       ├── f1_scores.pkl
+    |   |	   ├── f1_scores.pkl
     |   |          ├── precisions.pkl
     │   |          ├── recalls.pkl
     |   |          └── timings.pkl
     |   ├── DB15K_EntityTriples.nt             # Converted in N-Triples format
     |   ├── FB15K_EntityTriples.nt             # Converted in N-Triples format
     |   └── DB15K_SameAsLink.nt                # Converted in N-Triples format
-	|
-	├── plots                                  # Folder to store the plots
-	|    ├── ....                                
+    |
+    ├── plots                                  # Folder to store the plots
+    |    ├── ....                                
     |    └── Different kind of plots .pdf                                
     |    
     ├── main.py                                 # Main entry point
