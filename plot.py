@@ -184,12 +184,18 @@ def compute_max_interval_per_seed(seeds: list, means_metric: object):
 
 
 def plot_confidence(means_metric, mean, interval, max_interval, title, xlabel):
-    """Plot a histogram with the confidence interval
-
+    """
+    Plot a histogram with the confidence interval
+    The X axis is kept with the same scale, in order to make visible the standard deviation.
+    In order to achieve so, the largest interval among the measurements of the same metric
+    is stored in max_interval, and a fraction (max_interval - current_interval) / 2
+    is added at the beginning and at the end of the current interval.
+    In this way, all seeds for the same metric will share the interval max_interval on the x-axis.
     Args:
         means_metric (list): list of means computed from the samples
         mean (float): mean of the list
         interval (list): the lower and upper bound of the confidence interval
+        max_interval (float): the max interval among the different seeds on the x-axis for the same metric
         title (str): Title for the plot
         xlabel (str): Label for the x axis
     """
@@ -202,6 +208,7 @@ def plot_confidence(means_metric, mean, interval, max_interval, title, xlabel):
     plt.axvline(interval[1], color='k', linestyle='dashed', linewidth=1)
     plt.axvline(mean, color='r', linestyle='dashed', linewidth=1)
 
+    # Use the same scale on the X axis, to make visible the standard deviation.
     interv = max(means_metric) - min(means_metric)
     lower_limit = min(means_metric) - (max_interval - interv) / 2
     upper_limit = max(means_metric) + (max_interval - interv) / 2
@@ -313,6 +320,7 @@ def last_iter_goodness(seeds, metrics, metrics_names):
         # fill entirely the y axis (just for graphical purposes). 1/5 is just a good number.
         for s in seeds:
             # Create a boxplot for each combination Metric/Seed
+            # Use the same scale on the Y-axis to make the standard deviation visible.
             limit_bottom = min(metric_last[s])
             limit_top = max(metric_last[s])
             interval = limit_top - limit_bottom
