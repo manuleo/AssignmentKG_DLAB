@@ -165,6 +165,24 @@ def confidence_interval(means, conf_percent):
     return [lower, upper]
 
 
+def compute_max_interval_per_seed(seeds: list, means_metric: object):
+    """
+    Given an object with the metrics indexed by seed, return the 
+    largest interval among the min and the max metric for the same seed.
+    Args:
+        seeds: list of strings with the names of the seeds ('0.1', '0.2', '0.5')
+        means_metric: object of list of metrics indexed by the seed.
+    Returns:
+        max_interval: float, the max interval 
+    """
+    max_interval = 0
+    for s in seeds:
+        max_interval = max(max_interval, 
+                        max(means_metric[s]) - min(means_metric[s]))
+    max_interval += max_interval/5
+    return max_interval
+
+
 def plot_confidence(means_metric, mean, interval, max_interval, title, xlabel):
     """Plot a histogram with the confidence interval
 
@@ -211,14 +229,12 @@ def metrics_confidence(metrics, metrics_names, seeds):
         means_metric = {}
         interval = {}
         mean = {}
-        max_interval = 0
         for s in seeds:
             means_metric[s] = bootstrap_metric(metrics[m][s], 1000)
             interval[s] = confidence_interval(means_metric[s], 0.95)
             mean[s] = np.mean(means_metric[s])
-            max_interval = max(max_interval, 
-                            max(means_metric[s]) - min(means_metric[s]))
-        max_interval += max_interval/5
+        max_interval = compute_max_interval_per_seed(seeds, means_metric)
+        
         for s in seeds:
             # Compute interval for the metric/seed pair and plot them 
             
@@ -253,14 +269,12 @@ def timings_confidence(seeds, timings):
     means_timings = {}
     interval = {}
     mean = {}
-    max_interval = 0
     for s in seeds:
         means_timings[s] = bootstrap_metric(timings[s], 1000)
         interval[s] = confidence_interval(means_timings[s], 0.95)
         mean[s] = np.mean(means_timings[s])
-        max_interval = max(max_interval, 
-                            max(means_timings[s]) - min(means_timings[s]))
-    max_interval += max_interval/5
+    max_interval = compute_max_interval_per_seed(seeds, means_timings)
+    
     for s in seeds:
         # Compute interval for the given seed and plot it
         
@@ -290,26 +304,22 @@ def last_iter_goodness(seeds, metrics, metrics_names):
     for m in metrics_names:
         # We want to share for the same metric the same y scale, so that the standard deviation
         # is visible graphically (otherwise all y scales adapt to the size of the boxplot).
-        max_interval = 0    # Compute the max_interval: initially set to zero, so that it can always improve
+        metric_last = {}
         for s in seeds:
             last_iter = max(metrics[m][s][0].keys())
-            metric_last = [val[last_iter] for val in metrics[m][s]]
-            max_interval = max(max_interval,      # Update the max_interval
-                               max(metric_last) - min(metric_last))
+            metric_last[s] = [val[last_iter] for val in metrics[m][s]]
+        max_interval = compute_max_interval_per_seed(seeds, metric_last)
         # Add to the max interval a small fraction, so that the bigger interval box plot does not 
         # fill entirely the y axis (just for graphical purposes). 1/5 is just a good number.
-        max_interval += max_interval / 5   
         for s in seeds:
             # Create a boxplot for each combination Metric/Seed
-            last_iter = max(metrics[m][s][0].keys())
-            metric_last = [val[last_iter] for val in metrics[m][s]]
-            limit_bottom = min(metric_last)
-            limit_top = max(metric_last)
+            limit_bottom = min(metric_last[s])
+            limit_top = max(metric_last[s])
             interval = limit_top - limit_bottom
             limit_bottom = limit_bottom - (max_interval - interval)/2
             limit_top = limit_top + (max_interval - interval)/2
             plt.subplot(3, 3, iterator)
-            plt.boxplot([metric_last], labels=["{metric} metric - Seed {seed}".format(metric=m.capitalize(), seed=str(float(s)*100)+"%")])
+            plt.boxplot([metric_last[s]], labels=["{metric} metric - Seed {seed}".format(metric=m.capitalize(), seed=str(float(s)*100)+"%")])
             plt.ylabel(m.capitalize(), fontsize=15)
             plt.ylim((limit_bottom, limit_top))
             plt.title("{} metric behaviour\n at last iteration".format(m.capitalize()),
