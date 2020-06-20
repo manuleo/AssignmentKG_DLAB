@@ -12,7 +12,7 @@ The minimum requirements for the `main.py` are:
 - `matplotlib` (tested on version *3.1.3*)
 
 ### Note about the plots
-We used a LaTeX backend for our plots so that they have a "LaTeX style" and we can use its syntax for axes labeling, titles, and anything else. If you want to reproduce the plots (using the `-plots` flag, see *Usage instruction* below), you will need to have LaTeX installed locally on your machine. The installation really depends on your OS, so we recommend to go to [LaTeX official website](https://www.latex-project.org/get/) for more information. 
+We used a LaTeX backend for our plots so that they have a "LaTeX style" and we can use its syntax for axes labeling, titles, and anything else. If you want to reproduce the plots (using the `--plots` flag, see *Usage instruction* below), you will need to have LaTeX installed locally on your machine. The installation really depends on your OS, so we recommend to go to [LaTeX official website](https://www.latex-project.org/get/) for more information. 
 For Ubuntu users, we recommend using `apt-get` to install. We installed the full version on our machines (Note that this version is around 6GB big):
 
     sudo apt-get install texlive-full
@@ -73,6 +73,7 @@ Whatever your choice, aggregated metrics for the last iteration only and 95% con
     ├── plot.py                                 # Plotting utility script
     ├── requirements.txt                        # Python requirements
     ├── Analysis.ipynb                          # Notebook with disclosed output 
+    ├── Testing.ipynb                           # Notebook with plots and tests
     └── README.md
 
 ```
@@ -81,6 +82,8 @@ Whatever your choice, aggregated metrics for the last iteration only and 95% con
 ## Code reproducibility
 Due to the probabilistic nature of PARIS, together with the random seed generation, the user is advised that **some small differences are possible among different runs**. However, we found PARIS to be a very stable algorithm so the overall conclusion remains the same.
 *Our configuration*: especially for the timing analysis, it is important to consider the configuration we used to run our experiments. That is a Lenovo Thinkpad T450s with **12GB RAM** and Intel **I7-5600U CPU**
+
+Moreover, a special note has to be added for the two jupyter notebooks: since we are using the Latex style for the plots, sometimes we have faced unexpected troubles at rendering such graphics (running the cells which should output the plot does not have any effect). We didn't manage to solve this bug, which occurred irregularily and is not well documented on the Internet. If you would ever run the code and face such trouble, we noticed that it is enough to re-run the `matplotlib` import and the latex style cells multiple times to solve such issues and render regularly the plots. 
 
 ## Authors
 - Manuel Leone
