@@ -22,8 +22,8 @@ We provide a notebook `Analysis.ipynb` with disclosed output with all the plots 
 
 ## Usage instruction
 1. Open CMD/Bash
-2. Move to the root folder, where the `main.py` is located
-3. Execute the command ```python3 main.py```, eventually adding one or more of the following arguments:
+2. Move to the root folder, where the folder `src` is located
+3. Execute the command ```python src/python3 main.py```, eventually adding one or more of the following arguments:
 ```
 Optional arguments:
   -h, --help  show this help message and exit
@@ -65,15 +65,18 @@ Whatever your choice, aggregated metrics for the last iteration only and 95% con
     |   └── DB15K_SameAsLink.nt                # Converted in N-Triples format
     |
     ├── plots                                  # Folder to store the plots
-    |    ├── ....                                
-    |    └── Different kind of plots .pdf                                
-    |    
-    ├── main.py                                 # Main entry point
+    |   ├── ....                                
+    |   └── Different kind of plots .pdf                                
+    |   
+    ├── src
+    |   ├── main.py                            # Main entry point                                
+    |   ├── plot.py                            # Plotting utility script  
+    |   ├── notebooks                            
+    |       ├── Analysis.ipynb                          # Notebook with disclosed output 
+    |       ├── Testing.ipynb                           # Notebook with plots and tests
+    
     ├── paris_0_3.jar                           # PARIS JAR to execute the experiments
-    ├── plot.py                                 # Plotting utility script
-    ├── requirements.txt                        # Python requirements
-    ├── Analysis.ipynb                          # Notebook with disclosed output 
-    ├── Testing.ipynb                           # Notebook with plots and tests
+    ├── requirements.txt                        # Python requirements    
     └── README.md
 
 ```
