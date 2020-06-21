@@ -3,7 +3,13 @@ import numpy as np
 import os, shutil
 import argparse
 import pickle
-from plot import plot, compute_mean_and_std_by_metric, bootstrap_metric, confidence_interval
+from plot import (
+    plot,
+    compute_mean_and_std_by_metric,
+    bootstrap_metric,
+    confidence_interval,
+)
+
 
 def create_label(sample_row):
     """
@@ -16,7 +22,7 @@ def create_label(sample_row):
         sample_row (Pandas row): Same row as input with two new labeled entries
     """
     # Build label from DB (we use as label what's after the resource/)
-    label = sample_row["DB"].split("/")[-1].replace(">","")
+    label = sample_row["DB"].split("/")[-1].replace(">", "")
     # Use label definition for N-Triples from W3C RDF recommendation. See https://www.w3.org/TR/n-triples/
     label_str = '{resource} <http://www.w3.org/2000/01/rdf-schema#label> "{label}" . \n'
 
@@ -24,6 +30,7 @@ def create_label(sample_row):
     sample_row["DB_labeled"] = label_str.format(resource=sample_row["DB"], label=label)
     sample_row["FB_labeled"] = label_str.format(resource=sample_row["FB"], label=label)
     return sample_row
+
 
 def create_sample(same_as, frac: float):
     """
@@ -37,9 +44,12 @@ def create_sample(same_as, frac: float):
         same_as (Pandas Dataframe): Sampled dataframe with two labeled column (one for DB and one for FB)
     """
     # Get a sample and build label
-    sampled = same_as.sample(frac=frac, replace=False)   # Create a sample without replacement.
+    sampled = same_as.sample(
+        frac=frac, replace=False
+    )  # Create a sample without replacement.
     sampled = sampled.apply(lambda x: create_label(x), axis=1)
     return sampled
+
 
 def precision(same_list: list, res_list: list):
     """
@@ -55,8 +65,11 @@ def precision(same_list: list, res_list: list):
     # Use precision definition from Information Retrieval
     same_set = set(same_list)
     res_set = set(res_list)
-    precision = len(same_set.intersection(res_set))/len(res_set) # Divide by the size of the found result
+    precision = len(same_set.intersection(res_set)) / len(
+        res_set
+    )  # Divide by the size of the found result
     return precision
+
 
 def recall(same_list, res_list):
     """
@@ -72,8 +85,11 @@ def recall(same_list, res_list):
     # Use recall definition from Information Retrieval
     same_set = set(same_list)
     res_set = set(res_list)
-    recall = len(same_set.intersection(res_set))/len(same_set) # Divide by the size of the truth
+    recall = len(same_set.intersection(res_set)) / len(
+        same_set
+    )  # Divide by the size of the truth
     return recall
+
 
 def f1_score(precision: float, recall: float):
     """
@@ -86,8 +102,9 @@ def f1_score(precision: float, recall: float):
     Returns:
         f1(float): F1 score
     """
-    f1 = 2*precision*recall/(precision + recall)
+    f1 = 2 * precision * recall / (precision + recall)
     return f1
+
 
 def check_result(same_list: list, out_path: str):
     """
@@ -115,9 +132,11 @@ def check_result(same_list: list, out_path: str):
             # PARIS create an empty file at the last_iter+1. If we encountered it, we can break
             if os.stat(full_path).st_size == 0:
                 break
-            
+
             # Get PARIS result from the .tsv and elaborate it a bit to be compared with the same_list
-            res_list = pd.read_csv(full_path, delimiter="\t", header=None, usecols=[0,1]).values.tolist()
+            res_list = pd.read_csv(
+                full_path, delimiter="\t", header=None, usecols=[0, 1]
+            ).values.tolist()
             res_list = [" ".join(x) for x in res_list]
 
             # Compute the wanted metrics and save the results
@@ -130,10 +149,13 @@ def check_result(same_list: list, out_path: str):
         else:
             # If we didn't find the file, we can stop
             break
-        run+=1
+        run += 1
     return precision_dict, recall_dict, f1_dict
 
-def run_experiment(same_as, DB_lines: list, FB_lines: list, same_list: list, frac: float, n: int = 20):
+
+def run_experiment(
+    same_as, DB_lines: list, FB_lines: list, same_list: list, frac: float, n: int = 20
+):
     """
     Run PARIS for n times with the given fraction of the ground truth and seed and save the results
        for each iteration/run
@@ -152,16 +174,16 @@ def run_experiment(same_as, DB_lines: list, FB_lines: list, same_list: list, fra
         f1_scores (list): List of dict with the f1_score of each PARIS run by iteration
         timings (list): List of running time of each PARIS run
     """
-    
+
     # Create the necessary static directories.
     if not os.path.isdir("data"):
         os.mkdir("data")
     if not os.path.isdir("data/seeded"):
         os.mkdir("data/seeded")
     if not os.path.isdir("output"):
-        os.mkdir('output')
-    
-    print("Chosen fraction = {}%".format(frac*100))
+        os.mkdir("output")
+
+    print("Chosen fraction = {}%".format(frac * 100))
     timings = []
     precisions = []
     recalls = []
@@ -173,13 +195,13 @@ def run_experiment(same_as, DB_lines: list, FB_lines: list, same_list: list, fra
         sampled = create_sample(same_as, frac)
         DB_lines_labeled = DB_lines + sampled["DB_labeled"].to_list()
         FB_lines_labeled = FB_lines + sampled["FB_labeled"].to_list()
-        DB_path = "data/seeded/{frac}/DB_{i}.nt".format(frac = frac, i = i)
-        FB_path = "data/seeded/{frac}/FB_{i}.nt".format(frac = frac, i = i)
+        DB_path = "data/seeded/{frac}/DB_{i}.nt".format(frac=frac, i=i)
+        FB_path = "data/seeded/{frac}/FB_{i}.nt".format(frac=frac, i=i)
 
         # Create the necessary directories if they are not already present.
         if not os.path.isdir("data/seeded/{frac}".format(frac=frac)):
             os.mkdir("data/seeded/{frac}".format(frac=frac))
-        
+
         # Save the seeded files
         DB_label = open(DB_path, "w")
         FB_label = open(FB_path, "w")
@@ -187,7 +209,7 @@ def run_experiment(same_as, DB_lines: list, FB_lines: list, same_list: list, fra
         FB_label.writelines(FB_lines_labeled)
 
         # Delete old PARIS directory and create again to be empty
-        out_path = "output/{frac}/{i}".format(frac = frac, i = i)
+        out_path = "output/{frac}/{i}".format(frac=frac, i=i)
         if os.path.exists(out_path):
             shutil.rmtree(out_path)
         if not os.path.isdir("output/{frac}".format(frac=frac)):
@@ -196,13 +218,17 @@ def run_experiment(same_as, DB_lines: list, FB_lines: list, same_list: list, fra
 
         # Run PARIS
         print("Running PARIS...")
-        out_paris = os.popen("java -jar paris_0_3.jar {FB_path} {DB_path} {out_path}".format(FB_path=FB_path, DB_path=DB_path, out_path=out_path)).read()
+        out_paris = os.popen(
+            "java -jar paris_0_3.jar {FB_path} {DB_path} {out_path}".format(
+                FB_path=FB_path, DB_path=DB_path, out_path=out_path
+            )
+        ).read()
         print("PARIS output:\n", out_paris)
 
         # Get total running time directly from PARIS output (printed in millisecond)
         timing = [int(s) for s in out_paris.split() if s.isdigit()][0]
         timings.append(timing)
-        
+
         # Compute the wanted metrics
         precision, recall, f1_score = check_result(same_list, out_path)
         print("Computed precision per iteration:")
@@ -217,7 +243,7 @@ def run_experiment(same_as, DB_lines: list, FB_lines: list, same_list: list, fra
         precisions.append(precision)
         recalls.append(recall)
         f1_scores.append(f1_score)
-        
+
         # Final clean of open files/PARIS temporary files
         print("Cleaning...")
         DB_label.close()
@@ -225,6 +251,7 @@ def run_experiment(same_as, DB_lines: list, FB_lines: list, same_list: list, fra
         os.system("rm run_*")
 
     return precisions, recalls, f1_scores, timings
+
 
 def load_pickles():
     """
@@ -236,8 +263,8 @@ def load_pickles():
         metrics_names (list): list of computed metrics
         timings (dict): dict of list of timings for each seed
     """
-    seeds = ['0.1', '0.2', '0.5']
-    metrics_names = ['precision', 'recall', 'f1_score']
+    seeds = ["0.1", "0.2", "0.5"]
+    metrics_names = ["precision", "recall", "f1_score"]
     metrics = {}
     timings = {}
 
@@ -246,15 +273,16 @@ def load_pickles():
         metrics[m] = {}
     for s in seeds:
         with open("data/pkl/{seed}/precisions.pkl".format(seed=s), "rb") as f:
-            metrics['precision'][s] = pickle.load(f)
+            metrics["precision"][s] = pickle.load(f)
         with open("data/pkl/{seed}/recalls.pkl".format(seed=s), "rb") as f:
-            metrics['recall'][s] = pickle.load(f)
+            metrics["recall"][s] = pickle.load(f)
         with open("data/pkl/{seed}/f1_scores.pkl".format(seed=s), "rb") as f:
-            metrics['f1_score'][s] = pickle.load(f)
+            metrics["f1_score"][s] = pickle.load(f)
         with open("data/pkl/{seed}/timings.pkl".format(seed=s), "rb") as f:
             timings[s] = pickle.load(f)
-        
+
     return seeds, metrics, metrics_names, timings
+
 
 def main(no_paris: bool, plots: bool):
     """
@@ -268,8 +296,8 @@ def main(no_paris: bool, plots: bool):
     if not no_paris:
         print("Start working on PARIS. Loading datasets...")
         # Loading the SameAs relation dataset to produce the seed
-        same_as = pd.read_csv("data/DB15K_SameAsLink.nt", " ", header=None)[[0,2]]
-        same_as.rename(columns={0:"FB", 2:"DB"}, inplace=True)
+        same_as = pd.read_csv("data/DB15K_SameAsLink.nt", " ", header=None)[[0, 2]]
+        same_as.rename(columns={0: "FB", 2: "DB"}, inplace=True)
         # Loading the triples datasets and read the content
         DB = open("data/DB15K_EntityTriples.nt", "r")
         FB = open("data/FB15K_EntityTriples.nt", "r")
@@ -278,13 +306,18 @@ def main(no_paris: bool, plots: bool):
         # Loading again the SameAs (to be used as ground truth) and transform it so that's easy comparable with the PARIS result
         same_file = open("data/DB15K_SameAsLink.nt", "r")
         same_list = same_file.readlines()
-        same_list = [same.replace(" <SameAs>", "").replace("<http://dbpedia.org/","dbp:")[:-4] for same in same_list]
+        same_list = [
+            same.replace(" <SameAs>", "").replace("<http://dbpedia.org/", "dbp:")[:-4]
+            for same in same_list
+        ]
 
         # Go over the different seed size and run PARIS
         for frac in [0.1, 0.2, 0.5]:
-            precisions, recalls, f1_scores, timings = run_experiment(same_as, DB_lines, FB_lines, same_list, frac)
+            precisions, recalls, f1_scores, timings = run_experiment(
+                same_as, DB_lines, FB_lines, same_list, frac
+            )
             # Save performance results from PARIS
-            print("Finished with fraction {}%. Saving data...".format(frac*100))
+            print("Finished with fraction {}%. Saving data...".format(frac * 100))
             with open("data/pkl/{}/precisions.pkl".format(frac), "wb") as f:
                 pickle.dump(precisions, f)
             with open("data/pkl/{}/recalls.pkl".format(frac), "wb") as f:
@@ -311,51 +344,64 @@ def main(no_paris: bool, plots: bool):
     for metric in metrics_names:
         print("\nMetric: {}".format(metric.capitalize()))
         for s in seeds:
-            metric_means, metric_stds = compute_mean_and_std_by_metric(metrics[metric][s])
+            metric_means, metric_stds = compute_mean_and_std_by_metric(
+                metrics[metric][s]
+            )
             metric_mean, metric_std = metric_means.pop(), metric_stds.pop()
             # Print mean and std of the metric for the given seed (only last iteration printed for simplicity)
-            print("    Seed:", str(float(s)*100)+"%")
+            print("    Seed:", str(float(s) * 100) + "%")
             print("        Last Iteration Mean:", metric_mean)
             print("        Last Iteration Std:", metric_std)
             means_metric = bootstrap_metric(metrics[metric][s], 1000)
             interval = confidence_interval(means_metric, 0.95)
-            print("        Last Iteration Confidence interval: [{low_inter} - {high_inter}]".format(low_inter=interval[0], high_inter=interval[1]))
+            print(
+                "        Last Iteration Confidence interval: [{low_inter} - {high_inter}]".format(
+                    low_inter=interval[0], high_inter=interval[1]
+                )
+            )
     # Print mean and std of timings
     print("\nMetric: Running Time")
     for s in seeds:
-        print("    Seed:", str(float(s)*100)+"%")
+        print("    Seed:", str(float(s) * 100) + "%")
         mean_timings = np.mean(timings[s])
         std_timings = np.std(timings[s])
-        print("        Mean (s):", mean_timings/1000)
-        print("        Std  (s):", std_timings/1000)
+        print("        Mean (s):", mean_timings / 1000)
+        print("        Std  (s):", std_timings / 1000)
         means_timings = bootstrap_metric(timings[s], 1000)
         interval = confidence_interval(means_timings, 0.95)
-        print("        Confidence interval (s): [{low_inter} - {high_inter}]".format(low_inter=interval[0]/1000, high_inter=interval[1]/1000))
+        print(
+            "        Confidence interval (s): [{low_inter} - {high_inter}]".format(
+                low_inter=interval[0] / 1000, high_inter=interval[1] / 1000
+            )
+        )
 
-        
     if plots:
         print("\nStart saving plots")
         plot(seeds, metrics, metrics_names, timings)
         print("\nAll plots saved!")
-    
+
     print("\nNothing else to do! Closing")
-        
-            
 
 
 if __name__ == "__main__":
     """
     Run main with argument
     """
-    parser = argparse.ArgumentParser(description="Run PARIS entity matching and compute metrics")
+    parser = argparse.ArgumentParser(
+        description="Run PARIS entity matching and compute metrics"
+    )
 
     parser.add_argument(
-        "--no_paris", action="store_true", help="Use this flag to avoid running PARIS and load precomputed results from pickle instead. "
-                                                "If not set, the full algorithm will be executed 20 times for 3 different seed fractions (10%%/20%%/50%%)."
-                                                "This may require about an hour."
+        "--no_paris",
+        action="store_true",
+        help="Use this flag to avoid running PARIS and load precomputed results from pickle instead. "
+        "If not set, the full algorithm will be executed 20 times for 3 different seed fractions (10%%/20%%/50%%)."
+        "This may require about an hour.",
     )
     parser.add_argument(
-        "--plots", action="store_true", help="Produce the same plots as shown in the report and in the notebook and save them to pdf for later use."
+        "--plots",
+        action="store_true",
+        help="Produce the same plots as shown in the report and in the notebook and save them to pdf for later use.",
     )
 
     args = parser.parse_args()
