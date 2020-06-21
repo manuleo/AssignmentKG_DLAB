@@ -6,7 +6,8 @@ import pickle
 from plot import plot, compute_mean_and_std_by_metric, bootstrap_metric, confidence_interval
 
 def create_label(sample_row):
-    """Create a label for each dataset, given a SameAs row
+    """
+    Create a label for each dataset, given a SameAs row
 
     Args:
         sample_row (Pandas row): Row from SameAs, with the two entities which are the same
@@ -24,8 +25,9 @@ def create_label(sample_row):
     sample_row["FB_labeled"] = label_str.format(resource=sample_row["FB"], label=label)
     return sample_row
 
-def create_sample(same_as, frac):
-    """[summary]
+def create_sample(same_as, frac: float):
+    """
+    Get a sample from same_as.
 
     Args:
         same_as (Pandas Dataframe): Dataframe containing the ground truth
@@ -39,8 +41,9 @@ def create_sample(same_as, frac):
     sampled = sampled.apply(lambda x: create_label(x), axis=1)
     return sampled
 
-def precision(same_list, res_list):
-    """Compute the precision, given the two result
+def precision(same_list: list, res_list: list):
+    """
+    Compute the precision, given the two result.
 
     Args:
         same_list (list): Lines from the ground truth, elaborated to be compared with the PARIS result
@@ -56,7 +59,8 @@ def precision(same_list, res_list):
     return precision
 
 def recall(same_list, res_list):
-    """Compute the recall, given the two result
+    """
+    Compute the recall, given the two result
 
     Args:
         same_list (list): Lines from the ground truth, elaborated to be compared with the PARIS result
@@ -71,8 +75,9 @@ def recall(same_list, res_list):
     recall = len(same_set.intersection(res_set))/len(same_set) # Divide by the size of the truth
     return recall
 
-def f1_score(precision, recall):
-    """Compute the F1 score, given Precision and recall
+def f1_score(precision: float, recall: float):
+    """
+    Compute the F1 score, given Precision and recall
 
     Args:
         precision (float): Precision at the given iteration
@@ -84,8 +89,9 @@ def f1_score(precision, recall):
     f1 = 2*precision*recall/(precision + recall)
     return f1
 
-def check_result(same_list, out_path):
-    """Compare the PARIS result with the ground truth to compute Precision, Recall, F1 score by iteration
+def check_result(same_list: list, out_path: str):
+    """
+    Compare the PARIS result with the ground truth to compute Precision, Recall, F1 score by iteration
 
     Args:
         same_list (list): Lines from the ground truth, elaborated to be compared with the PARIS result
@@ -127,8 +133,9 @@ def check_result(same_list, out_path):
         run+=1
     return precision_dict, recall_dict, f1_dict
 
-def run_experiment(same_as, DB_lines, FB_lines, same_list, frac, n=20):
-    """Run PARIS for n times with the given fraction of the ground truth and seed and save the results
+def run_experiment(same_as, DB_lines: list, FB_lines: list, same_list: list, frac: float, n: int = 20):
+    """
+    Run PARIS for n times with the given fraction of the ground truth and seed and save the results
        for each iteration/run
 
     Args:
@@ -220,7 +227,8 @@ def run_experiment(same_as, DB_lines, FB_lines, same_list, frac, n=20):
     return precisions, recalls, f1_scores, timings
 
 def load_pickles():
-    """Load the computed pickles
+    """
+    Load the computed pickles
 
     Returns:
         seeds (list): list of seed used
@@ -248,8 +256,9 @@ def load_pickles():
         
     return seeds, metrics, metrics_names, timings
 
-def main(no_paris, plots):
-    """Main function to run experiment on PARIS and produce plots
+def main(no_paris: bool, plots: bool):
+    """
+    Main function to run experiment on PARIS and produce plots
 
     Args:
         no_paris (bool): True if we want to load precomputed pickles instead of running PARIS
@@ -335,7 +344,8 @@ def main(no_paris, plots):
 
 
 if __name__ == "__main__":
-    """Run main with argument
+    """
+    Run main with argument
     """
     parser = argparse.ArgumentParser(description="Run PARIS entity matching and compute metrics")
 
