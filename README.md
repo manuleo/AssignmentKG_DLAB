@@ -65,18 +65,15 @@ Whatever your choice, aggregated metrics for the last iteration only and 95% con
     |   └── DB15K_SameAsLink.nt                # Converted in N-Triples format
     |
     ├── plots                                  # Folder to store the plots
-    |   ├── ....                                
-    |   └── Different kind of plots .pdf                                
-    |   
-    ├── src
-    |   ├── main.py                            # Main entry point                                
-    |   ├── plot.py                            # Plotting utility script  
-    |   ├── notebooks                            
-    |       ├── Analysis.ipynb                          # Notebook with disclosed output 
-    |       ├── Testing.ipynb                           # Notebook with plots and tests
-    
+    |    ├── ....                                
+    |    └── Different kind of plots .pdf                                
+    |    
+    ├── main.py                                 # Main entry point
     ├── paris_0_3.jar                           # PARIS JAR to execute the experiments
-    ├── requirements.txt                        # Python requirements    
+    ├── plot.py                                 # Plotting utility script
+    ├── requirements.txt                        # Python requirements
+    ├── Analysis.ipynb                          # Notebook with disclosed output 
+    ├── Report.pdf                              # Report in PDF 
     └── README.md
 
 ```
