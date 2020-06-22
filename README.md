@@ -22,8 +22,8 @@ We provide a notebook `Analysis.ipynb` with disclosed output with all the plots 
 
 ## Usage instruction
 1. Open CMD/Bash
-2. Move to the root folder, where the folder `src` is located
-3. Execute the command ```python src/python3 main.py```, eventually adding one or more of the following arguments:
+2. Move to the root folder, where the `main.py` is located
+3. Execute the command ```python3 main.py```, eventually adding one or more of the following arguments:
 ```
 Optional arguments:
   -h, --help  show this help message and exit
